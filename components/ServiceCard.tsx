@@ -13,55 +13,64 @@ interface ServiceCardProps {
 const ServiceCard: React.FC<ServiceCardProps> = ({ service, isLocked, onClick }) => {
   const CardContent = (
     <div 
-      className={`group relative flex flex-col h-full bg-[#fcfcfc] border border-black/[0.03] p-10 transition-all duration-500 ease-out ${
+      className={`service-card-hover group relative h-[450px] flex flex-col p-12 bg-white border-r border-b border-black/5 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] ${
         isLocked 
-        ? 'opacity-40 cursor-not-allowed grayscale' 
-        : 'hover:bg-white hover:border-black/10 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] cursor-pointer'
+        ? 'opacity-30 grayscale cursor-not-allowed' 
+        : 'hover:bg-black cursor-pointer'
       }`}
       onClick={isLocked ? undefined : onClick}
     >
-      <div className={`w-14 h-14 flex items-center justify-center mb-10 transition-all duration-500 ${
-        isLocked ? 'text-slate-300' : 'text-black group-hover:text-red-600 group-hover:scale-110'
+      {/* Background Accent */}
+      <div className="absolute top-0 right-0 w-full h-0 bg-[#8fcc25]/10 group-hover:h-2 transition-all duration-500"></div>
+      
+      {/* Icon Area */}
+      <div className={`icon-move w-16 h-16 mb-12 flex items-center justify-center transition-all duration-700 ${
+        isLocked ? 'text-slate-300' : 'text-black group-hover:text-white'
       }`}>
         {getIcon(service.icon)}
       </div>
       
-      <div className="flex items-start justify-between mb-4">
-        <h3 className="text-2xl font-black text-black tracking-tight leading-none uppercase">
+      {/* Header */}
+      <div className="flex justify-between items-start mb-6">
+        <h3 className={`text-3xl font-black uppercase tracking-tighter leading-none transition-colors duration-500 ${
+          isLocked ? 'text-slate-200' : 'text-black group-hover:text-white'
+        }`}>
           {service.title}
         </h3>
         {!isLocked && (
-          <div className="text-slate-200 group-hover:text-red-600 transition-colors">
-            <ArrowUpRight size={24} strokeWidth={2.5} />
-          </div>
+          <ArrowUpRight size={24} className="text-slate-200 group-hover:text-[#8fcc25] transition-colors duration-500" />
         )}
       </div>
       
-      <p className="text-slate-500 font-medium leading-relaxed flex-grow text-sm">
+      {/* Description */}
+      <p className={`text-sm font-medium leading-relaxed transition-colors duration-500 ${
+        isLocked ? 'text-slate-200' : 'text-slate-500 group-hover:text-slate-400'
+      }`}>
         {service.description}
       </p>
 
-      {/* Hover decoration */}
-      <div className="mt-8 h-[2px] w-0 bg-red-600 transition-all duration-500 group-hover:w-12"></div>
+      {/* Decorative vertical line */}
+      <div className="mt-auto pt-8 flex items-center gap-4">
+        <div className="h-[1px] w-8 bg-black/10 group-hover:bg-[#8fcc25] group-hover:w-16 transition-all duration-700"></div>
+        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 group-hover:text-white/20 transition-colors">Wikęd0{Math.floor(Math.random()*9+1)}</span>
+      </div>
       
       {isLocked && (
-        <div className="absolute top-6 right-6">
-          <Lock size={16} className="text-slate-300" />
+        <div className="absolute top-12 right-12">
+          <Lock size={16} className="text-slate-200" />
         </div>
       )}
     </div>
   );
 
-  if (isLocked) {
-    return CardContent;
-  }
+  if (isLocked) return CardContent;
 
   return service.url && service.url !== '#' ? (
-    <a href={service.url} target="_blank" rel="noopener noreferrer" className="block h-full">
+    <a href={service.url} target="_blank" rel="noopener noreferrer" className="block w-full">
       {CardContent}
     </a>
   ) : (
-    <div className="h-full">{CardContent}</div>
+    <div className="w-full">{CardContent}</div>
   );
 };
 

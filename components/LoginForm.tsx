@@ -21,7 +21,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
     if (!username || !password || !email) {
-      setError('Uzupełnij wymagane pola danych.');
+      setError('Wymagane uzupełnienie wszystkich pól konfiguracji.');
       return;
     }
     setLoading(true);
@@ -33,7 +33,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       setLoading(false);
       setUsername('');
       setPassword('');
-    }, 1000);
+    }, 1200);
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -50,107 +50,110 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       } else if (isRegistered || (username && password)) {
         onLogin({ id: '2', username: username, email: email || 'partner@wiked.pl', role: UserRole.USER });
       } else {
-        setError('Identyfikacja nieudana. Sprawdź dane.');
+        setError('Identyfikacja profilu odrzucona. Sprawdź parametry logowania.');
       }
       setLoading(false);
-    }, 1000);
+    }, 1200);
   };
 
   return (
-    <div className="max-w-xl mx-auto bg-white p-12 md:p-16 border border-black/5 shadow-[0_60px_100px_-20px_rgba(0,0,0,0.1)] rounded-sm">
-      <div className="flex gap-10 mb-16 border-b border-black/5 pb-10">
-        <div className={`flex flex-col gap-2 ${mode === 'register' ? 'opacity-100' : 'opacity-30 cursor-pointer'}`} onClick={() => setMode('register')}>
-           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600">Krok 01</span>
-           <span className="text-xl font-black uppercase tracking-tight">Dodaj Konto</span>
-        </div>
-        <div className={`flex flex-col gap-2 ${mode === 'login' ? 'opacity-100' : 'opacity-30'}`}>
-           <span className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600">Krok 02</span>
-           <span className="text-xl font-black uppercase tracking-tight">Autoryzacja</span>
-        </div>
+    <div className="bg-white border-4 border-black p-12 md:p-20 shadow-[40px_40px_0px_rgba(0,0,0,0.05)]">
+      {/* Mode Toggle Header */}
+      <div className="flex border-b border-black/5 mb-20">
+        <button 
+          onClick={() => setMode('register')}
+          className={`pb-8 px-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${mode === 'register' ? 'text-black' : 'text-slate-300'}`}
+        >
+          01. Rejestracja Profilu
+          {mode === 'register' && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#8fcc25]"></div>}
+        </button>
+        <button 
+          onClick={() => setMode('login')}
+          className={`pb-8 px-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${mode === 'login' ? 'text-black' : 'text-slate-300'}`}
+        >
+          02. Autoryzacja Dostępu
+          {mode === 'login' && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#8fcc25]"></div>}
+        </button>
       </div>
 
-      <div className="mb-12">
-        <h2 className="text-4xl font-black text-black tracking-tighter uppercase mb-4">
-          {mode === 'register' ? 'Dodaj Profil iQuote' : 'Zaloguj sesję'}
+      <div className="mb-20">
+        <h2 className="text-huge text-black mb-6">
+          {mode === 'register' ? 'Profil' : 'Dostęp'}
         </h2>
-        <p className="text-slate-400 font-medium">
-          Dostęp do systemów partnerskich Wikęd wymaga autoryzacji kontem iQuote.
+        <p className="text-slate-400 font-medium text-lg">
+          {mode === 'register' 
+            ? 'Skonfiguruj swoje dane dostępowe do ekosystemu iQuote.' 
+            : 'Wprowadź poświadczenia dla autoryzowanej sesji.'}
         </p>
       </div>
 
-      <form onSubmit={mode === 'register' ? handleRegister : handleLogin} className="space-y-8">
-        <div className="group">
-          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 group-focus-within:text-red-600 transition-colors">Identyfikator iQuote</label>
-          <div className="relative border-b-2 border-slate-100 group-focus-within:border-red-600 transition-all">
-            <input 
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full py-4 bg-transparent outline-none text-xl font-bold text-black placeholder:text-slate-200"
-              placeholder="Twój login systemowy"
-            />
-          </div>
+      <form onSubmit={mode === 'register' ? handleRegister : handleLogin} className="space-y-12">
+        <div className="group border-l-2 border-slate-100 focus-within:border-[#8fcc25] pl-8 transition-all">
+          <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 group-focus-within:text-[#8fcc25]">Login iQuote</label>
+          <input 
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full bg-transparent outline-none text-3xl font-black text-black placeholder:text-slate-100 uppercase tracking-tighter"
+            placeholder="Identyfikator"
+          />
         </div>
 
         {mode === 'register' && (
-          <div className="group animate-in fade-in slide-in-from-top-2 duration-500">
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 group-focus-within:text-red-600 transition-colors">E-mail służbowy</label>
-            <div className="relative border-b-2 border-slate-100 group-focus-within:border-red-600 transition-all">
-              <input 
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full py-4 bg-transparent outline-none text-xl font-bold text-black placeholder:text-slate-200"
-                placeholder="mail@partner.pl"
-              />
-            </div>
+          <div className="group border-l-2 border-slate-100 focus-within:border-[#8fcc25] pl-8 transition-all animate-in fade-in slide-in-from-top-4">
+            <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 group-focus-within:text-[#8fcc25]">E-mail</label>
+            <input 
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-transparent outline-none text-3xl font-black text-black placeholder:text-slate-100 tracking-tighter"
+              placeholder="Partner@Domain.pl"
+            />
           </div>
         )}
 
-        <div className="group">
-          <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 group-focus-within:text-red-600 transition-colors">Hasło Dostępu</label>
-          <div className="relative border-b-2 border-slate-100 group-focus-within:border-red-600 transition-all">
-            <input 
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full py-4 bg-transparent outline-none text-xl font-bold text-black placeholder:text-slate-200 tracking-widest"
-              placeholder="••••••••"
-            />
-          </div>
+        <div className="group border-l-2 border-slate-100 focus-within:border-[#8fcc25] pl-8 transition-all">
+          <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 group-focus-within:text-[#8fcc25]">Hasło</label>
+          <input 
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-transparent outline-none text-3xl font-black text-black placeholder:text-slate-100 tracking-[0.3em]"
+            placeholder="••••••••"
+          />
         </div>
 
         {error && (
-          <div className="flex items-center gap-3 text-red-600 bg-red-50 p-5 rounded-sm text-sm font-bold border border-red-100 animate-in shake">
+          <div className="flex items-center gap-4 text-red-600 border border-red-100 bg-red-50/50 p-6 font-bold uppercase text-[10px] tracking-widest">
             <AlertCircle size={20} />
-            <span>{error}</span>
+            {error}
           </div>
         )}
 
         {registeredAccount && mode === 'login' && !error && (
-          <div className="flex items-center gap-3 text-green-600 bg-green-50 p-5 rounded-sm text-sm font-bold border border-green-100">
+          <div className="flex items-center gap-4 text-green-600 border border-green-100 bg-green-50/50 p-6 font-bold uppercase text-[10px] tracking-widest">
             <CheckCircle2 size={20} />
-            <span>Konto iQuote zostało zarejestrowane. Możesz się zalogować.</span>
+            Konfiguracja profilu zakończona pomyślnie.
           </div>
         )}
 
         <button 
           type="submit"
           disabled={loading}
-          className="w-full bg-black hover:bg-red-600 text-white font-black uppercase tracking-[0.2em] text-xs py-6 transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
+          className="w-full h-24 bg-black text-white hover:bg-[#8fcc25] font-black uppercase tracking-[0.4em] text-xs transition-all flex items-center justify-center gap-6 group disabled:opacity-20"
         >
           {loading ? (
-            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+            <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
           ) : (
             <>
-              <span>{mode === 'register' ? 'Zarejestruj profil' : 'Rozpocznij pracę'}</span>
-              <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+              {mode === 'register' ? 'Skonfiguruj Profil' : 'Autoryzuj Dostęp'}
+              <ArrowRight size={20} className="group-hover:translate-x-4 transition-transform duration-500" />
             </>
           )}
         </button>
 
-        <p className="text-center text-[9px] text-slate-300 font-bold uppercase tracking-[0.3em] pt-8">
-          Wszystkie dane są szyfrowane i przechowywane lokalnie.
+        <p className="text-[9px] font-black text-slate-300 text-center uppercase tracking-[0.5em] pt-12">
+          Secure Core Environment / Wikęd-v03
         </p>
       </form>
     </div>
