@@ -9,7 +9,8 @@ import {
   Hammer, 
   GraduationCap, 
   LayoutDashboard,
-  UserCircle
+  UserCircle,
+  Key
 } from 'lucide-react';
 import { ServiceLink } from './types';
 
@@ -17,7 +18,7 @@ export const SERVICE_LINKS: ServiceLink[] = [
   {
     id: 'wiked-pl',
     title: 'Wikęd.pl',
-    description: 'Strona główna producenta drzwi Wikęd.',
+    description: 'Oficjalny portal producenta drzwi premium. Poznaj pełną ofertę i aktualności.',
     url: 'https://wiked.pl/',
     icon: 'globe',
     category: 'main'
@@ -25,7 +26,7 @@ export const SERVICE_LINKS: ServiceLink[] = [
   {
     id: 'studio',
     title: 'Studio Wikęd',
-    description: 'Konfigurator drzwi - zaprojektuj swoje wymarzone wejście.',
+    description: 'Zaawansowany konfigurator 3D – zaprojektuj swoje idealne drzwi online.',
     url: 'https://konfigurator.wiked.pl/',
     icon: 'settings',
     category: 'main'
@@ -33,15 +34,24 @@ export const SERVICE_LINKS: ServiceLink[] = [
   {
     id: 'salony',
     title: 'Salony',
-    description: 'Znajdź najbliższy salon sprzedaży drzwi Wikęd.',
+    description: 'Mapa autoryzowanych salonów sprzedaży. Znajdź ekspertów w swojej okolicy.',
     url: 'https://gdziekupic.wiked.pl/',
     icon: 'map-pin',
     category: 'main'
   },
   {
+    id: 'moj-wiked',
+    title: 'Mój Wikęd',
+    description: 'Dostęp do konta iQuote. Zarządzaj swoimi zamówieniami i danymi po zalogowaniu.',
+    url: '#',
+    icon: 'user-circle',
+    category: 'main',
+    requiresAuth: true
+  },
+  {
     id: 'wymiary',
     title: 'Wymiary',
-    description: 'Kalkulator wymiarów montażowych i otworów.',
+    description: 'Kalkulator techniczny – precyzyjne wytyczne montażowe i wymiary otworów.',
     url: 'https://kalkulator.wiked.pl/',
     icon: 'calculator',
     category: 'tools'
@@ -49,7 +59,7 @@ export const SERVICE_LINKS: ServiceLink[] = [
   {
     id: 'gwarancja',
     title: 'Gwarancja',
-    description: 'Zarejestruj produkt lub sprawdź status gwarancji.',
+    description: 'Strefa klienta – rejestracja produktów oraz zgłaszanie zgłoszeń serwisowych.',
     url: 'https://strefa.wiked.pl/zaloguj',
     icon: 'shield-check',
     category: 'support'
@@ -57,15 +67,15 @@ export const SERVICE_LINKS: ServiceLink[] = [
   {
     id: 'strefa-montera',
     title: 'Strefa Montera',
-    description: 'Portal dedykowany dla profesjonalnych montażystów.',
+    description: 'Dokumentacja i narzędzia dla profesjonalnych ekip montażowych.',
     url: 'https://strefa.wiked.pl/monter',
     icon: 'hammer',
     category: 'support'
   },
   {
     id: 'akademia',
-    title: 'Zostań Montażystą',
-    description: 'Akademia Wikęd - szkolenia i certyfikacja dla fachowców.',
+    title: 'Akademia Wikęd',
+    description: 'Zostań certyfikowanym monterem. Profesjonalne szkolenia i rozwój kompetencji.',
     url: 'https://akademia.wiked.pl/',
     icon: 'graduation-cap',
     category: 'support'
@@ -73,7 +83,7 @@ export const SERVICE_LINKS: ServiceLink[] = [
   {
     id: 'admin-panel',
     title: 'Panel Admina',
-    description: 'Zarządzanie systemem Wikęd One (tylko dla administratorów).',
+    description: 'Centralne zarządzanie uprawnieniami i parametrami platformy Wikęd One.',
     url: '#',
     icon: 'layout-dashboard',
     category: 'admin',
@@ -93,6 +103,7 @@ export const getIcon = (name: string) => {
     case 'graduation-cap': return <GraduationCap size={iconSize} />;
     case 'layout-dashboard': return <LayoutDashboard size={iconSize} />;
     case 'user-circle': return <UserCircle size={iconSize} />;
+    case 'key': return <Key size={iconSize} />;
     default: return <Globe size={iconSize} />;
   }
 };
