@@ -116,7 +116,6 @@ const App: React.FC = () => {
     setShowAddAccount(false);
   };
 
-  // Fixed: Added missing removeAccount function
   const removeAccount = (accountId: string) => {
     if (!user) return;
     setUser({
@@ -340,8 +339,8 @@ const App: React.FC = () => {
                  </div>
               </div>
 
-              {/* MOJ WIKED - iQuote Section (Only if accounts present) */}
-              {user && user.linkedAccounts && user.linkedAccounts.length > 0 && (
+              {/* MOJ WIKED - iQuote Section (Everyone sees it after login) */}
+              {user && (
                 <div id="moj-wiked-section" className="mt-24 space-y-12 animate-in slide-in-from-bottom-8 duration-700">
                    <div className="flex flex-col md:flex-row items-end justify-between gap-6 border-b border-black/5 pb-8">
                      <div>
@@ -353,7 +352,7 @@ const App: React.FC = () => {
                        onClick={() => setShowAddAccount(!showAddAccount)}
                        className="flex items-center gap-3 bg-black text-white px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest hover:bg-[#8fcc25] transition-all"
                      >
-                       <Plus size={18} /> {showAddAccount ? 'Anuluj' : 'Podepnij nowe konto iQuote'}
+                       <Plus size={18} /> {showAddAccount ? 'Anuluj' : 'Podepnij konto iQuote'}
                      </button>
                    </div>
 
@@ -464,21 +463,34 @@ const App: React.FC = () => {
                            )}
                         </div>
                       ))}
+
+                      {/* No linked accounts state (e.g. for Jan initially) */}
+                      {(!user.linkedAccounts || user.linkedAccounts.length === 0) && !showAddAccount && (
+                        <div className="py-24 text-center border-2 border-dashed border-slate-100 bg-slate-50/50">
+                          <p className="text-slate-300 font-black uppercase tracking-widest text-xs mb-2">Brak podpiętych kont iQuote.</p>
+                          <p className="text-slate-400 text-[10px] font-medium">Użyj przycisku "Podepnij konto iQuote", aby powiązać profile handlowe ze swoim kontem Wikęd One.</p>
+                        </div>
+                      )}
                    </div>
                 </div>
               )}
 
               {/* Tools Section */}
               <div className="py-24 flex items-center justify-between">
-                <h2 className="text-[11px] font-extrabold uppercase tracking-[0.3em] text-black">Narzędzia Projektowe</h2>
+                <h2 className="text-[11px] font-extrabold uppercase tracking-[0.3em] text-black">Usługi i Narzędzia</h2>
                 <div className="h-[2px] flex-grow mx-12 bg-black/5"></div>
                 <span className="text-[11px] font-bold text-slate-300">TECHNOLOGIA</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-black/5">
-                {SERVICE_LINKS.filter(s => s.category === 'main' || s.category === 'tools' || s.category === 'support').map((service) => (
-                  <ServiceCard key={service.id} service={service} onClick={() => handleServiceClick(service.id)} />
-                ))}
+                {/* Filter out Login card if user is already logged in */}
+                {SERVICE_LINKS
+                  .filter(s => s.category !== 'admin')
+                  .filter(s => user ? s.id !== 'moj-wiked' : true)
+                  .map((service) => (
+                    <ServiceCard key={service.id} service={service} onClick={() => handleServiceClick(service.id)} />
+                  ))
+                }
               </div>
 
               {/* Footer Banner */}
