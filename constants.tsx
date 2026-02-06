@@ -10,7 +10,8 @@ import {
   GraduationCap, 
   LayoutDashboard,
   UserCircle,
-  Key
+  Key,
+  Users
 } from 'lucide-react';
 import { ServiceLink } from './types';
 
@@ -41,8 +42,8 @@ export const SERVICE_LINKS: ServiceLink[] = [
   },
   {
     id: 'moj-wiked',
-    title: 'Mój Wikęd',
-    description: 'Dostęp do konta iQuote. Zarządzaj swoimi zamówieniami i danymi po zalogowaniu.',
+    title: 'Konto / Zaloguj',
+    description: 'Dostęp do konta iQuote. Zarządzaj swoimi zamówieniami i danymi po autoryzacji.',
     url: '#',
     icon: 'user-circle',
     category: 'main',
@@ -104,6 +105,7 @@ export const getIcon = (name: string) => {
     case 'layout-dashboard': return <LayoutDashboard size={iconSize} />;
     case 'user-circle': return <UserCircle size={iconSize} />;
     case 'key': return <Key size={iconSize} />;
+    case 'users': return <Users size={iconSize} />;
     default: return <Globe size={iconSize} />;
   }
 };
