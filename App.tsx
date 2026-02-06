@@ -147,6 +147,14 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleAddDoorClick = () => {
+    if (!user) {
+      setShowLogin(true);
+    } else {
+      setShowAddDoor(!showAddDoor);
+    }
+  };
+
   const addIQuoteAccount = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newAccLogin || !newAccPass || !user) return;
@@ -289,17 +297,17 @@ const App: React.FC = () => {
         </div>
       </nav>
 
-      <main className="flex-grow pt-56 pb-32">
+      <main className="flex-grow pt-40 md:pt-56 pb-32">
         <div className="container mx-auto px-6 lg:px-12">
           {showLogin && !user ? (
-            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 max-w-4xl mx-auto">
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 w-full max-w-4xl mx-auto flex items-center justify-center min-h-[60vh]">
               <LoginForm onLogin={handleLogin} />
             </div>
           ) : (
             <div className="stagger-in">
               {/* Header */}
               <div className="relative mb-40">
-                <div className="absolute -top-24 -left-10 text-[14rem] font-black text-slate-100/50 select-none -z-10 pointer-events-none uppercase tracking-tighter opacity-70">
+                <div className="absolute -top-24 -left-10 text-[14rem] font-black text-slate-100/50 select-none -z-10 pointer-events-none uppercase tracking-tighter opacity-70 hidden xl:block">
                   Wikęd
                 </div>
                 <h1 className="text-huge mb-16">
@@ -420,7 +428,6 @@ const App: React.FC = () => {
                                     <h5 className="text-[10px] font-black uppercase tracking-[0.2em]">Moi APS (Sieć Sprzedaży)</h5>
                                   </div>
                                   
-                                  {/* APS SEARCH */}
                                   <div className="relative w-full md:w-64">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
                                     <input 
@@ -453,26 +460,11 @@ const App: React.FC = () => {
                                       </button>
                                     </div>
                                   ))}
-                                  {acc.apsList.filter(aps => 
-                                      aps.name.toLowerCase().includes(apsSearch.toLowerCase()) || 
-                                      aps.login.toLowerCase().includes(apsSearch.toLowerCase())
-                                    ).length === 0 && (
-                                    <div className="col-span-full py-6 text-center text-[9px] font-bold text-slate-300 uppercase tracking-widest">
-                                      Nie znaleziono punktów APS pasujących do frazy.
-                                    </div>
-                                  )}
                                 </div>
                              </div>
                            )}
                         </div>
                       ))}
-
-                      {(!user.linkedAccounts || user.linkedAccounts.length === 0) && !showAddAccount && (
-                        <div className="py-24 text-center border-2 border-dashed border-slate-100 bg-slate-50/50">
-                          <p className="text-slate-300 font-black uppercase tracking-widest text-xs mb-2">Brak podpiętych kont iQuote.</p>
-                          <p className="text-slate-400 text-[10px] font-medium">Użyj przycisku "Podepnij konto iQuote", aby powiązać profile handlowe ze swoim kontem Wikęd One.</p>
-                        </div>
-                      )}
                    </div>
                 </div>
               )}
@@ -487,7 +479,6 @@ const App: React.FC = () => {
                        <p className="text-slate-400 font-medium mt-4">Lista certyfikowanych specjalistów Wikęd w Twojej okolicy.</p>
                     </div>
                     
-                    {/* INSTALLER SEARCH */}
                     <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
                       <div className="relative w-full md:w-64">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
@@ -543,11 +534,6 @@ const App: React.FC = () => {
                         </div>
                       </div>
                     ))}
-                    {filteredInstallers.length === 0 && (
-                      <div className="col-span-full py-24 text-center border-2 border-dashed border-slate-100">
-                        <p className="text-slate-300 font-black uppercase tracking-[0.2em] text-xs">Nie znaleziono montera pasującego do kryteriów.</p>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -561,14 +547,14 @@ const App: React.FC = () => {
                       <p className="text-slate-400 font-medium mt-4">Zarejestruj swoje drzwi Wikęd, aby aktywować i przedłużyć ochronę gwarancyjną.</p>
                    </div>
                    <button 
-                     onClick={() => setShowAddDoor(!showAddDoor)}
+                     onClick={handleAddDoorClick}
                      className="flex items-center gap-3 bg-black text-white px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest hover:bg-[#8fcc25] transition-all"
                    >
-                     <ShieldPlus size={18} /> {showAddDoor ? 'Anuluj' : 'Dodaj Drzwi do Systemu'}
+                     <ShieldPlus size={18} /> {showAddDoor && user ? 'Anuluj' : 'Dodaj Drzwi do Systemu'}
                    </button>
                  </div>
 
-                 {showAddDoor && (
+                 {showAddDoor && user && (
                    <div className="bg-slate-50 p-12 border-2 border-dashed border-slate-200 animate-in fade-in zoom-in-95 duration-300">
                       <form onSubmit={addNewDoor} className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
                         <div className="space-y-4">
@@ -615,7 +601,7 @@ const App: React.FC = () => {
                      </div>
                    ))}
 
-                   {(!user?.warrantyDoors || user.warrantyDoors.length === 0) && !showAddDoor && (
+                   {(!user?.warrantyDoors || user.warrantyDoors.length === 0) && (!showAddDoor || !user) && (
                      <div className="col-span-full py-24 text-center border-2 border-dashed border-slate-100 bg-slate-50/50">
                         <p className="text-slate-300 font-black uppercase tracking-widest text-xs mb-2">Brak zarejestrowanych produktów.</p>
                         <p className="text-slate-400 text-[10px] font-medium">Użyj przycisku "Dodaj Drzwi", aby zintegrować swoje zakupy z Wikęd One.</p>

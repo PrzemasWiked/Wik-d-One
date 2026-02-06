@@ -35,7 +35,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       setMode('login');
       setLoading(false);
       setPassword('');
-      // Keep email for convenience when switching to login
     }, 1000);
   };
 
@@ -51,8 +50,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     setTimeout(() => {
       const isAdmin = email === 'admin@wiked.pl' && password === 'admin';
       const isRegistered = registeredUser && email === registeredUser.email && password === registeredUser.pass;
-      
-      // Default dummy check for any non-empty credentials if not specifically registered
       const isValid = isAdmin || isRegistered || (email.length > 5 && password.length > 3);
 
       if (isAdmin) {
@@ -63,7 +60,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           role: UserRole.ADMIN 
         });
       } else if (isValid) {
-        // Use part of email as display name
         const displayName = email.split('@')[0];
         onLogin({ 
           id: Date.now().toString(), 
@@ -79,91 +75,91 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
   };
 
   return (
-    <div className="bg-white border-4 border-black p-12 md:p-20 shadow-[40px_40px_0px_rgba(0,0,0,0.05)]">
+    <div className="bg-white border-[3px] border-black p-8 md:p-12 lg:p-16 shadow-[20px_20px_0px_rgba(0,0,0,0.03)] w-full max-w-2xl mx-auto overflow-hidden">
       {/* Mode Toggle Header */}
-      <div className="flex border-b border-black/5 mb-20">
+      <div className="flex border-b border-black/5 mb-12">
         <button 
           onClick={() => setMode('login')}
-          className={`pb-8 px-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${mode === 'login' ? 'text-black' : 'text-slate-300'}`}
+          className={`pb-4 px-2 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${mode === 'login' ? 'text-black' : 'text-slate-300'}`}
         >
           01. Logowanie
-          {mode === 'login' && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#8fcc25]"></div>}
+          {mode === 'login' && <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-[#8fcc25]"></div>}
         </button>
         <button 
           onClick={() => setMode('register')}
-          className={`pb-8 px-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${mode === 'register' ? 'text-black' : 'text-slate-300'}`}
+          className={`pb-4 px-6 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] transition-all relative ${mode === 'register' ? 'text-black' : 'text-slate-300'}`}
         >
           02. Nowe Konto
-          {mode === 'register' && <div className="absolute bottom-0 left-0 w-full h-1 bg-[#8fcc25]"></div>}
+          {mode === 'register' && <div className="absolute bottom-[-2px] left-0 w-full h-1 bg-[#8fcc25]"></div>}
         </button>
       </div>
 
-      <div className="mb-20">
-        <h2 className="text-huge text-black mb-6">
-          {mode === 'register' ? 'Witaj' : 'Witaj'}
+      <div className="mb-10">
+        <h2 className="text-5xl md:text-7xl font-black text-black mb-4 tracking-tighter uppercase leading-none">
+          WITAJ
         </h2>
-        <p className="text-slate-400 font-medium text-lg">
+        <p className="text-slate-400 font-medium text-sm md:text-base">
           {mode === 'register' 
             ? 'Stwórz profil w systemie Wikęd One.' 
             : 'Zaloguj się do swojego centrum usług.'}
         </p>
       </div>
 
-      <form onSubmit={mode === 'register' ? handleRegister : handleLogin} className="space-y-12">
-        <div className="group border-l-2 border-slate-100 focus-within:border-[#8fcc25] pl-8 transition-all">
-          <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 group-focus-within:text-[#8fcc25]">E-mail</label>
+      <form onSubmit={mode === 'register' ? handleRegister : handleLogin} className="space-y-8">
+        <div className="group border-l-2 border-slate-100 focus-within:border-[#8fcc25] pl-6 transition-all">
+          <label className="block text-[9px] font-black text-slate-300 uppercase tracking-widest mb-2 group-focus-within:text-[#8fcc25]">E-mail</label>
           <input 
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-transparent outline-none text-3xl font-black text-black placeholder:text-slate-100 tracking-tighter"
+            className="w-full bg-transparent outline-none text-xl md:text-2xl font-black text-black placeholder:text-slate-100 tracking-tight"
             placeholder="partner@domain.pl"
             autoComplete="email"
           />
         </div>
 
-        <div className="group border-l-2 border-slate-100 focus-within:border-[#8fcc25] pl-8 transition-all">
-          <label className="block text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4 group-focus-within:text-[#8fcc25]">Hasło</label>
+        <div className="group border-l-2 border-slate-100 focus-within:border-[#8fcc25] pl-6 transition-all">
+          <label className="block text-[9px] font-black text-slate-300 uppercase tracking-widest mb-2 group-focus-within:text-[#8fcc25]">Hasło</label>
           <input 
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-transparent outline-none text-3xl font-black text-black placeholder:text-slate-100 tracking-[0.3em]"
+            className="w-full bg-transparent outline-none text-xl md:text-2xl font-black text-black placeholder:text-slate-100 tracking-[0.3em]"
             placeholder="••••••••"
             autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
           />
         </div>
 
         {error && (
-          <div className="flex items-center gap-4 text-red-600 border border-red-100 bg-red-50/50 p-6 font-bold uppercase text-[10px] tracking-widest">
-            <AlertCircle size={20} />
+          <div className="flex items-center gap-3 text-red-600 border border-red-100 bg-red-50/50 p-4 font-bold uppercase text-[9px] tracking-widest">
+            <AlertCircle size={16} />
             {error}
           </div>
         )}
 
         {registeredUser && mode === 'login' && !error && (
-          <div className="flex items-center gap-4 text-green-600 border border-green-100 bg-green-50/50 p-6 font-bold uppercase text-[10px] tracking-widest">
-            <CheckCircle2 size={20} />
-            Konto utworzone. Możesz się zalogować.
+          <div className="flex items-center gap-3 text-green-600 border border-green-100 bg-green-50/50 p-4 font-bold uppercase text-[9px] tracking-widest">
+            <CheckCircle2 size={16} />
+            Konto utworzone. Zaloguj się.
           </div>
         )}
 
         <button 
           type="submit"
           disabled={loading}
-          className="w-full h-24 bg-black text-white hover:bg-[#8fcc25] font-black uppercase tracking-[0.4em] text-xs transition-all flex items-center justify-center gap-6 group disabled:opacity-20"
+          className="w-full h-16 md:h-20 bg-black text-white hover:bg-[#8fcc25] font-black uppercase tracking-[0.4em] text-[10px] transition-all flex items-center justify-center gap-4 group disabled:opacity-20"
         >
           {loading ? (
-            <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
           ) : (
             <>
               {mode === 'register' ? 'Utwórz Konto' : 'Zaloguj się'}
-              <ArrowRight size={20} className="group-hover:translate-x-4 transition-transform duration-500" />
+              <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform duration-500" />
             </>
           )}
         </button>
 
-        <p className="text-[9px] font-black text-slate-300 text-center uppercase tracking-[0.5em] pt-12">
+        <p className="text-[8px] font-black text-slate-300 text-center uppercase tracking-[0.5em] pt-6">
           Wikęd One Ecosystem / v2.5
         </p>
       </form>
