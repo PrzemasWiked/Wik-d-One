@@ -5,11 +5,24 @@ export enum UserRole {
   GUEST = 'GUEST'
 }
 
+export enum IQuoteAccountType {
+  DISTRIBUTOR = 'DISTRIBUTOR',
+  APS = 'APS'
+}
+
+export interface APSInfo {
+  id: string;
+  name: string;
+  login: string;
+}
+
 export interface IQuoteAccount {
   id: string;
   login: string;
   passwordHash: string;
   label?: string;
+  type: IQuoteAccountType;
+  apsList?: APSInfo[];
 }
 
 export interface User {

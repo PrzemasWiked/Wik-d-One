@@ -1,19 +1,42 @@
 
 import React, { useState, useEffect } from 'react';
-import { User, UserRole, IQuoteAccount } from './types';
+import { User, UserRole, IQuoteAccount, IQuoteAccountType } from './types';
 import { SERVICE_LINKS } from './constants';
 import ServiceCard from './components/ServiceCard';
 import LoginForm from './components/LoginForm';
-import { LogOut, ArrowRight, ChevronRight, Menu, Key, LayoutGrid, Hammer, ExternalLink, Plus, Trash2, ShieldCheck, UserCircle } from 'lucide-react';
+import { 
+  LogOut, ArrowRight, ChevronRight, Menu, Key, 
+  LayoutGrid, Hammer, ExternalLink, Plus, Trash2, 
+  ShieldCheck, UserCircle, Briefcase, CreditCard, 
+  FileText, Package, Users, Activity
+} from 'lucide-react';
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
+  // Domyślny user: pb@wiked.pl Przemek
+  const [user, setUser] = useState<User | null>({
+    id: 'pb-wiked-001',
+    username: 'Przemek',
+    email: 'pb@wiked.pl',
+    role: UserRole.USER,
+    linkedAccounts: [
+      {
+        id: 'iq-5557',
+        login: '5557 TEST-DYS',
+        passwordHash: '••••••••',
+        label: 'Dystrybutor Główny',
+        type: IQuoteAccountType.DISTRIBUTOR,
+        apsList: [
+          { id: 'aps-5559', name: 'APS TEST', login: '5559' }
+        ]
+      }
+    ]
+  });
+  
   const [showLogin, setShowLogin] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [newAccLogin, setNewAccLogin] = useState('');
   const [newAccPass, setNewAccPass] = useState('');
 
-  // Scroll to top when login view is triggered
   useEffect(() => {
     if (showLogin) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -21,12 +44,10 @@ const App: React.FC = () => {
   }, [showLogin]);
 
   const handleLogin = (newUser: User) => {
-    // Initial user setup
-    const userWithAccounts = {
+    setUser({
       ...newUser,
       linkedAccounts: newUser.linkedAccounts || []
-    };
-    setUser(userWithAccounts);
+    });
     setShowLogin(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -45,7 +66,8 @@ const App: React.FC = () => {
       id: Math.random().toString(36).substr(2, 9),
       login: newAccLogin,
       passwordHash: '••••••••',
-      label: `iQuote ${user.linkedAccounts?.length ? user.linkedAccounts.length + 1 : 1}`
+      label: `iQuote ${user.linkedAccounts?.length ? user.linkedAccounts.length + 1 : 1}`,
+      type: IQuoteAccountType.APS // Domyślnie nowe konta jako APS
     };
 
     setUser({
@@ -79,7 +101,6 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col selection:bg-[#8fcc25] selection:text-white">
-      {/* Background Decor */}
       <div className="fixed inset-0 grid-bg opacity-40 pointer-events-none -z-10"></div>
 
       {/* Navigation */}
@@ -136,7 +157,6 @@ const App: React.FC = () => {
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="flex-grow pt-56 pb-32">
         <div className="container mx-auto px-6 lg:px-12">
           {showLogin && !user ? (
@@ -151,7 +171,6 @@ const App: React.FC = () => {
             </div>
           ) : (
             <div className="stagger-in">
-              {/* Header */}
               <div className="relative mb-40">
                 <div className="absolute -top-24 -left-10 text-[14rem] font-black text-slate-100/50 select-none -z-10 pointer-events-none uppercase tracking-tighter opacity-70">
                   Wikęd
@@ -164,12 +183,11 @@ const App: React.FC = () => {
                 <div className="flex gap-10">
                   <div className="w-1 bg-[#8fcc25]"></div>
                   <p className="max-w-xl text-xl font-medium text-slate-400 leading-relaxed">
-                    Ekosystem narzędzi dla profesjonalistów i klientów. Zarządzaj projektami, wymiarami i konfiguracją w jednej przestrzeni Wikęd One.
+                    Witaj {user?.username}. Twój ekosystem narzędzi Wikęd One jest gotowy. Zarządzaj kontami handlowymi, wymiarami i konfiguracją z jednego miejsca.
                   </p>
                 </div>
               </div>
 
-              {/* Grid: Main Services */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-t border-l border-black/5">
                 {SERVICE_LINKS.filter(s => s.category === 'main').map((service) => {
                   const dynamicService = {...service};
@@ -187,20 +205,20 @@ const App: React.FC = () => {
                 })}
               </div>
 
-              {/* Logged in Area - Multiple iQuote Accounts */}
+              {/* MOJ WIKED - Expanded Account Dashboard */}
               {user && (
                 <div id="moj-wiked-section" className="mt-24 space-y-12 animate-in slide-in-from-bottom-8 duration-700">
                    <div className="flex flex-col md:flex-row items-end justify-between gap-6 border-b border-black/5 pb-8">
                      <div>
-                        <span className="text-[#8fcc25] text-[11px] font-extrabold uppercase tracking-[0.3em] mb-4 block">Profil Użytkownika</span>
+                        <span className="text-[#8fcc25] text-[11px] font-extrabold uppercase tracking-[0.3em] mb-4 block">Dashboard handlowy iQuote</span>
                         <h2 className="text-5xl font-black uppercase tracking-tighter leading-none">Mój <span className="text-[#8fcc25]">Wikęd</span></h2>
-                        <p className="text-slate-400 font-medium mt-4">Poniżej znajdziesz swoje podpięte dostępy handlowe iQuote.</p>
+                        <p className="text-slate-400 font-medium mt-4">Poniżej znajdziesz swoje podpięte dostępy iQuote oraz przypisane do nich funkcje.</p>
                      </div>
                      <button 
                        onClick={() => setShowAddAccount(!showAddAccount)}
                        className="flex items-center gap-3 bg-black text-white px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest hover:bg-[#8fcc25] transition-all"
                      >
-                       <Plus size={18} /> {showAddAccount ? 'Anuluj' : 'Dodaj dostęp iQuote'}
+                       <Plus size={18} /> {showAddAccount ? 'Anuluj' : 'Podepnij nowe konto'}
                      </button>
                    </div>
 
@@ -227,39 +245,100 @@ const App: React.FC = () => {
                               placeholder="••••••••"
                             />
                           </div>
-                          <button type="submit" className="bg-[#8fcc25] text-white p-4 font-black uppercase text-[11px] tracking-widest hover:bg-black transition-all">Autoryzuj i Dodaj</button>
+                          <button type="submit" className="bg-[#8fcc25] text-white p-4 font-black uppercase text-[11px] tracking-widest hover:bg-black transition-all">Dodaj i Synchronizuj</button>
                         </form>
                      </div>
                    )}
                    
-                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                   <div className="grid grid-cols-1 gap-12">
                       {user.linkedAccounts?.map((acc) => (
-                        <div key={acc.id} className="group relative bg-white border border-black/5 p-10 hover:shadow-2xl hover:border-[#8fcc25]/20 transition-all duration-500 overflow-hidden">
-                           <div className="absolute top-0 right-0 w-24 h-24 bg-[#8fcc25]/5 rounded-bl-full translate-x-8 -translate-y-8 group-hover:translate-x-4 group-hover:-translate-y-4 transition-transform duration-700"></div>
-                           <div className="flex justify-between items-start mb-10">
-                              <div className="w-12 h-12 bg-slate-100 flex items-center justify-center text-slate-400 group-hover:text-[#8fcc25] transition-colors">
-                                <Key size={20} />
-                              </div>
-                              <button 
-                                onClick={() => removeAccount(acc.id)}
-                                className="text-slate-200 hover:text-red-500 transition-colors"
-                                title="Usuń powiązanie"
-                              >
-                                <Trash2 size={16} />
-                              </button>
+                        <div key={acc.id} className="bg-white border-2 border-black p-8 md:p-12 shadow-[20px_20px_0px_rgba(143,204,37,0.1)] relative overflow-hidden group">
+                           <div className="absolute top-0 right-0 p-8">
+                             <span className={`text-[10px] font-black uppercase tracking-widest px-4 py-2 border ${acc.type === IQuoteAccountType.DISTRIBUTOR ? 'bg-black text-white' : 'border-black text-black'}`}>
+                               {acc.type === IQuoteAccountType.DISTRIBUTOR ? 'Dystrybutor' : 'APS'}
+                             </span>
                            </div>
-                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2 block">{acc.label}</span>
-                           <h4 className="text-xl font-black uppercase tracking-tighter mb-1">{acc.login}</h4>
-                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                             <ShieldCheck size={12} className="text-[#8fcc25]" /> Aktywne iQuote
-                           </p>
+
+                           <div className="flex flex-col md:flex-row gap-12 mb-12 border-b border-black/5 pb-12">
+                              <div className="flex-grow">
+                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-300 mb-2 block">Profil Handlowy</span>
+                                <h4 className="text-4xl font-black uppercase tracking-tighter mb-2">{acc.login}</h4>
+                                <div className="flex items-center gap-4 text-slate-400">
+                                  <span className="text-[10px] font-bold uppercase flex items-center gap-1"><ShieldCheck size={12} className="text-[#8fcc25]"/> Status: Aktywny</span>
+                                  <span className="text-[10px] font-bold uppercase flex items-center gap-1"><Activity size={12} className="text-[#8fcc25]"/> Ostatnia synchronizacja: dzisiaj</span>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <button onClick={() => removeAccount(acc.id)} className="p-4 bg-slate-50 hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all border border-transparent hover:border-red-100">
+                                  <Trash2 size={20} />
+                                </button>
+                              </div>
+                           </div>
+
+                           {/* Funcjonalności iQuote */}
+                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                              <a href="https://leader.wiked.pl" target="_blank" className="flex flex-col gap-4 p-8 bg-slate-50 hover:bg-black group/item transition-all border border-black/5 hover:border-black">
+                                <Briefcase className="text-black group-hover/item:text-[#8fcc25]" size={28} />
+                                <span className="text-[10px] font-black uppercase tracking-widest group-hover/item:text-white">Leader</span>
+                                <span className="text-[9px] text-slate-400 uppercase font-medium">Synchronizacja poświadczeń</span>
+                              </a>
+                              <a href="https://pay.wiked.pl" target="_blank" className="flex flex-col gap-4 p-8 bg-slate-50 hover:bg-black group/item transition-all border border-black/5 hover:border-black">
+                                <CreditCard className="text-black group-hover/item:text-[#8fcc25]" size={28} />
+                                <span className="text-[10px] font-black uppercase tracking-widest group-hover/item:text-white">Wikęd Pay</span>
+                                <span className="text-[9px] text-slate-400 uppercase font-medium">System rozliczeń i faktur</span>
+                              </a>
+                              <a href="https://strefa.wiked.pl/reklamacje" target="_blank" className="flex flex-col gap-4 p-8 bg-slate-50 hover:bg-black group/item transition-all border border-black/5 hover:border-black">
+                                <FileText className="text-black group-hover/item:text-[#8fcc25]" size={28} />
+                                <span className="text-[10px] font-black uppercase tracking-widest group-hover/item:text-white">Reklamacje</span>
+                                <span className="text-[9px] text-slate-400 uppercase font-medium">Zarządzanie zgłoszeniami</span>
+                              </a>
+                              <a href="https://strefa.wiked.pl/zamowienia" target="_blank" className="flex flex-col gap-4 p-8 bg-slate-50 hover:bg-black group/item transition-all border border-black/5 hover:border-black">
+                                <Package className="text-black group-hover/item:text-[#8fcc25]" size={28} />
+                                <span className="text-[10px] font-black uppercase tracking-widest group-hover/item:text-white">Zamówienia</span>
+                                <span className="text-[9px] text-slate-400 uppercase font-medium">Historia i status realizacji</span>
+                              </a>
+                           </div>
+
+                           {/* Moi APS - Tylko dla dystrybutora */}
+                           {acc.type === IQuoteAccountType.DISTRIBUTOR && (
+                             <div className="bg-slate-50/50 p-8 border border-black/5">
+                                <div className="flex items-center justify-between mb-8">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-black text-[#8fcc25] flex items-center justify-center">
+                                      <Users size={20} />
+                                    </div>
+                                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em]">Moi APS (Punkty Sprzedaży)</h5>
+                                  </div>
+                                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{acc.apsList?.length || 0} Punktów</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {acc.apsList?.map((aps) => (
+                                    <div key={aps.id} className="bg-white p-6 border border-black/5 flex items-center justify-between group/aps hover:border-black transition-all">
+                                      <div className="flex items-center gap-4">
+                                        <div className="w-2 h-2 rounded-full bg-[#8fcc25]"></div>
+                                        <div>
+                                          <span className="block text-sm font-black uppercase tracking-tight">{aps.name}</span>
+                                          <span className="text-[9px] text-slate-400 font-bold uppercase">ID: {aps.login}</span>
+                                        </div>
+                                      </div>
+                                      <button className="text-slate-300 group-hover/aps:text-black transition-colors">
+                                        <ChevronRight size={16} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                  {(!acc.apsList || acc.apsList.length === 0) && (
+                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest text-center py-4">Brak przypisanych APS.</p>
+                                  )}
+                                </div>
+                             </div>
+                           )}
                         </div>
                       ))}
 
                       {(!user.linkedAccounts || user.linkedAccounts.length === 0) && (
-                        <div className="col-span-full py-24 text-center border-2 border-dashed border-slate-100 bg-slate-50/50">
+                        <div className="py-24 text-center border-2 border-dashed border-slate-100 bg-slate-50/50">
                           <p className="text-slate-300 font-black uppercase tracking-widest text-xs mb-2">Brak podpiętych kont iQuote.</p>
-                          <p className="text-slate-400 text-[10px] font-medium">Użyj przycisku "Dodaj dostęp iQuote", aby powiązać profile handlowe ze swoim kontem Wikęd One.</p>
+                          <p className="text-slate-400 text-[10px] font-medium">Użyj przycisku "Podepnij nowe konto", aby powiązać profile handlowe ze swoim kontem Wikęd One.</p>
                         </div>
                       )}
                    </div>
