@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { User, UserRole, IQuoteAccount, IQuoteAccountType, WarrantyDoor, InstallerProfile } from './types';
 import { SERVICE_LINKS } from './constants';
 import ServiceCard from './components/ServiceCard';
@@ -9,7 +9,7 @@ import {
   LayoutGrid, Hammer, ExternalLink, Plus, Trash2, 
   ShieldCheck, UserCircle, Briefcase, CreditCard, 
   FileText, Package, Users, Activity, ShieldPlus,
-  RefreshCw, CheckCircle, Clock, Award, Star, MapPin
+  RefreshCw, CheckCircle, Clock, Award, Star, MapPin, Search
 } from 'lucide-react';
 
 const AUTHORIZED_INSTALLERS: InstallerProfile[] = [
@@ -36,6 +36,14 @@ const AUTHORIZED_INSTALLERS: InstallerProfile[] = [
     rating: 4.9,
     completedCourses: ['Serwis i Konserwacja'],
     isCertified: true
+  },
+  {
+    id: 'inst-004',
+    name: 'Tomasz Lewandowski',
+    city: 'Gdańsk',
+    rating: 4.7,
+    completedCourses: ['Montaż Aluminium'],
+    isCertified: true
   }
 ];
 
@@ -53,7 +61,9 @@ const PRESET_USERS: User[] = [
         label: 'Dystrybutor Główny',
         type: IQuoteAccountType.DISTRIBUTOR,
         apsList: [
-          { id: 'aps-5559', name: 'APS TEST', login: '5559' }
+          { id: 'aps-5559', name: 'APS TEST 1', login: '5559' },
+          { id: 'aps-6001', name: 'Salon Drzwi Gdynia', login: '6001' },
+          { id: 'aps-6002', name: 'Partner Premium Wejherowo', login: '6002' }
         ]
       }
     ],
@@ -93,11 +103,16 @@ const App: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showAddAccount, setShowAddAccount] = useState(false);
   const [showAddDoor, setShowAddDoor] = useState(false);
+  
+  // Form states
   const [newAccLogin, setNewAccLogin] = useState('');
   const [newAccPass, setNewAccPass] = useState('');
-  
   const [doorModel, setDoorModel] = useState('');
   const [doorSerial, setDoorSerial] = useState('');
+
+  // Search states
+  const [installerSearch, setInstallerSearch] = useState('');
+  const [apsSearch, setApsSearch] = useState('');
 
   useEffect(() => {
     if (showLogin) {
@@ -110,6 +125,8 @@ const App: React.FC = () => {
     if (selected) {
       setUser(selected);
       setShowLogin(false);
+      setInstallerSearch('');
+      setApsSearch('');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -183,13 +200,20 @@ const App: React.FC = () => {
     setShowAddDoor(false);
   };
 
+  const filteredInstallers = useMemo(() => {
+    return AUTHORIZED_INSTALLERS.filter(inst => 
+      inst.name.toLowerCase().includes(installerSearch.toLowerCase()) ||
+      inst.city.toLowerCase().includes(installerSearch.toLowerCase())
+    );
+  }, [installerSearch]);
+
   const handleServiceClick = (serviceId: string) => {
-    if (serviceId === 'moj-wiked' || serviceId === 'gwarancja' || serviceId === 'monterzy') {
+    if (serviceId === 'moj-wiked' || serviceId === 'gwarancja' || serviceId === 'strefa-montera') {
       if (!user) {
         setShowLogin(true);
       } else {
         const targetId = serviceId === 'moj-wiked' ? 'moj-wiked-section' : 
-                         serviceId === 'monterzy' ? 'monterzy-section' : 'gwarancja-section';
+                         serviceId === 'strefa-montera' ? 'monterzy-section' : 'gwarancja-section';
         const section = document.getElementById(targetId);
         section?.scrollIntoView({ behavior: 'smooth' });
       }
@@ -212,7 +236,7 @@ const App: React.FC = () => {
             </div>
             
             <div className="hidden lg:flex gap-4">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-300 self-center">Switch:</span>
+              <span className="text-[10px] font-black uppercase tracking-widest text-slate-300 self-center">Profil:</span>
               <button 
                 onClick={() => switchUser('pb-wiked-001')}
                 className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 border-2 transition-all ${user?.id === 'pb-wiked-001' ? 'border-[#8fcc25] bg-[#8fcc25] text-white' : 'border-black text-black hover:bg-black hover:text-white'}`}
@@ -239,7 +263,7 @@ const App: React.FC = () => {
               <div className="flex items-center gap-4">
                 <div className="hidden xl:flex items-center gap-3">
                   <button onClick={() => handleServiceClick('moj-wiked')} className="text-[10px] font-extrabold uppercase tracking-widest bg-slate-100 hover:bg-[#8fcc25] hover:text-white px-4 py-2 transition-all">Mój Wikęd</button>
-                  <button onClick={() => handleServiceClick('monterzy')} className="text-[10px] font-extrabold uppercase tracking-widest bg-slate-100 hover:bg-black hover:text-white px-4 py-2 transition-all">Monterzy</button>
+                  <button onClick={() => handleServiceClick('strefa-montera')} className="text-[10px] font-extrabold uppercase tracking-widest bg-slate-100 hover:bg-black hover:text-white px-4 py-2 transition-all">Monterzy</button>
                 </div>
                 <div className="h-10 w-[1px] bg-black/5 hidden xl:block"></div>
                 <div className="flex flex-col items-end">
@@ -248,7 +272,7 @@ const App: React.FC = () => {
                     {user.username}
                   </span>
                   <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest">
-                    {user.isInstaller ? 'Certyfikowany Monter' : user.email}
+                    {user.isInstaller ? 'Ekspert Montażu' : user.email}
                   </span>
                 </div>
                 <button onClick={handleLogout} className="text-black hover:text-red-500 transition-colors p-2" title="Wyloguj">
@@ -292,7 +316,7 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* MOJ WIKED - iQuote Section */}
+              {/* MOJ WIKED SECTION */}
               {user && (
                 <div id="moj-wiked-section" className="mb-40 space-y-12 animate-in slide-in-from-bottom-8 duration-700">
                    <div className="flex flex-col md:flex-row items-end justify-between gap-6 border-b border-black/5 pb-8">
@@ -384,6 +408,62 @@ const App: React.FC = () => {
                                 <span className="text-[9px] text-slate-400 uppercase font-medium">Monitoring statusów</span>
                               </a>
                            </div>
+
+                           {/* MOI APSI Section for Distributors */}
+                           {acc.type === IQuoteAccountType.DISTRIBUTOR && acc.apsList && (
+                             <div className="bg-slate-50/50 p-8 border border-black/5">
+                                <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-6">
+                                  <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 bg-black text-[#8fcc25] flex items-center justify-center">
+                                      <Users size={20} />
+                                    </div>
+                                    <h5 className="text-[10px] font-black uppercase tracking-[0.2em]">Moi APS (Sieć Sprzedaży)</h5>
+                                  </div>
+                                  
+                                  {/* APS SEARCH */}
+                                  <div className="relative w-full md:w-64">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-300" size={14} />
+                                    <input 
+                                      type="text" 
+                                      placeholder="Szukaj APS..."
+                                      value={apsSearch}
+                                      onChange={(e) => setApsSearch(e.target.value)}
+                                      className="w-full bg-white border border-black/10 py-2 pl-10 pr-4 text-[10px] font-bold uppercase tracking-widest outline-none focus:border-[#8fcc25]"
+                                    />
+                                  </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {acc.apsList
+                                    .filter(aps => 
+                                      aps.name.toLowerCase().includes(apsSearch.toLowerCase()) || 
+                                      aps.login.toLowerCase().includes(apsSearch.toLowerCase())
+                                    )
+                                    .map((aps) => (
+                                    <div key={aps.id} className="bg-white p-6 border border-black/5 flex items-center justify-between group/aps hover:border-black transition-all">
+                                      <div className="flex items-center gap-4">
+                                        <div className="w-2 h-2 rounded-full bg-[#8fcc25]"></div>
+                                        <div>
+                                          <span className="block text-sm font-black uppercase tracking-tight">{aps.name}</span>
+                                          <span className="text-[9px] text-slate-400 font-bold uppercase">Login iQuote: {aps.login}</span>
+                                        </div>
+                                      </div>
+                                      <button className="text-slate-300 group-hover/aps:text-black transition-colors">
+                                        <ChevronRight size={16} />
+                                      </button>
+                                    </div>
+                                  ))}
+                                  {acc.apsList.filter(aps => 
+                                      aps.name.toLowerCase().includes(apsSearch.toLowerCase()) || 
+                                      aps.login.toLowerCase().includes(apsSearch.toLowerCase())
+                                    ).length === 0 && (
+                                    <div className="col-span-full py-6 text-center text-[9px] font-bold text-slate-300 uppercase tracking-widest">
+                                      Nie znaleziono punktów APS pasujących do frazy.
+                                    </div>
+                                  )}
+                                </div>
+                             </div>
+                           )}
                         </div>
                       ))}
 
@@ -397,7 +477,7 @@ const App: React.FC = () => {
                 </div>
               )}
 
-              {/* MONTERZY SECTION - Authorized Installers List */}
+              {/* MONTERZY SECTION */}
               {user && (
                 <div id="monterzy-section" className="mb-40 space-y-12 animate-in slide-in-from-bottom-8 duration-700">
                   <div className="flex flex-col md:flex-row items-end justify-between gap-6 border-b border-black/5 pb-8">
@@ -406,15 +486,29 @@ const App: React.FC = () => {
                        <h2 className="text-5xl font-black uppercase tracking-tighter leading-none">Autoryzowani <span className="text-amber-500">Monterzy</span></h2>
                        <p className="text-slate-400 font-medium mt-4">Lista certyfikowanych specjalistów Wikęd w Twojej okolicy.</p>
                     </div>
-                    {!user.isInstaller && (
-                      <a href="https://akademia.wiked.pl" target="_blank" className="flex items-center gap-3 bg-black text-white px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest hover:bg-amber-500 transition-all">
-                        <Award size={18} /> Zostań Montarzystą Wikęd
-                      </a>
-                    )}
+                    
+                    {/* INSTALLER SEARCH */}
+                    <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+                      <div className="relative w-full md:w-64">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                        <input 
+                          type="text" 
+                          placeholder="Szukaj po nazwisku lub mieście..."
+                          value={installerSearch}
+                          onChange={(e) => setInstallerSearch(e.target.value)}
+                          className="w-full bg-white border-2 border-black p-4 pl-12 text-[10px] font-black uppercase tracking-widest outline-none focus:border-amber-500"
+                        />
+                      </div>
+                      {!user.isInstaller && (
+                        <a href="https://akademia.wiked.pl" target="_blank" className="flex items-center gap-3 bg-black text-white px-8 py-5 text-[11px] font-extrabold uppercase tracking-widest hover:bg-amber-500 transition-all w-full md:w-auto">
+                          <Award size={18} /> Zostań Montarzystą
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {AUTHORIZED_INSTALLERS.map((inst) => (
+                    {filteredInstallers.map((inst) => (
                       <div key={inst.id} className={`bg-white border-2 p-8 transition-all hover:shadow-xl ${inst.name === user.installerProfile?.name ? 'border-amber-500 shadow-[10px_10px_0px_rgba(245,158,11,0.1)]' : 'border-black'}`}>
                         <div className="flex justify-between items-start mb-6">
                           <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
@@ -449,6 +543,11 @@ const App: React.FC = () => {
                         </div>
                       </div>
                     ))}
+                    {filteredInstallers.length === 0 && (
+                      <div className="col-span-full py-24 text-center border-2 border-dashed border-slate-100">
+                        <p className="text-slate-300 font-black uppercase tracking-[0.2em] text-xs">Nie znaleziono montera pasującego do kryteriów.</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
