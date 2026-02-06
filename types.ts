@@ -16,6 +16,15 @@ export interface APSInfo {
   login: string;
 }
 
+export interface WarrantyDoor {
+  id: string;
+  model: string;
+  serialNumber: string;
+  purchaseDate: string;
+  warrantyUntil: string;
+  status: 'active' | 'expired';
+}
+
 export interface IQuoteAccount {
   id: string;
   login: string;
@@ -31,6 +40,7 @@ export interface User {
   role: UserRole;
   email: string;
   linkedAccounts?: IQuoteAccount[];
+  warrantyDoors?: WarrantyDoor[];
 }
 
 export interface ServiceLink {
