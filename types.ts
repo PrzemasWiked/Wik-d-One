@@ -34,13 +34,24 @@ export interface IQuoteAccount {
   apsList?: APSInfo[];
 }
 
+export interface InstallerProfile {
+  id: string;
+  name: string;
+  city: string;
+  rating: number;
+  completedCourses: string[];
+  isCertified: boolean;
+}
+
 export interface User {
   id: string;
   username: string;
   role: UserRole;
   email: string;
+  isInstaller?: boolean;
   linkedAccounts?: IQuoteAccount[];
   warrantyDoors?: WarrantyDoor[];
+  installerProfile?: InstallerProfile;
 }
 
 export interface ServiceLink {
