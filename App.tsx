@@ -1,13 +1,17 @@
+
 import React, { useState, useEffect } from 'react';
-import { User, UserRole } from './types';
+import { User, UserRole, IQuoteAccount } from './types';
 import { SERVICE_LINKS } from './constants';
 import ServiceCard from './components/ServiceCard';
 import LoginForm from './components/LoginForm';
-import { LogOut, ArrowRight, ChevronRight, Menu, Key, LayoutGrid, Hammer, ExternalLink } from 'lucide-react';
+import { LogOut, ArrowRight, ChevronRight, Menu, Key, LayoutGrid, Hammer, ExternalLink, Plus, Trash2, ShieldCheck, UserCircle } from 'lucide-react';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [showLogin, setShowLogin] = useState(false);
+  const [showAddAccount, setShowAddAccount] = useState(false);
+  const [newAccLogin, setNewAccLogin] = useState('');
+  const [newAccPass, setNewAccPass] = useState('');
 
   // Scroll to top when login view is triggered
   useEffect(() => {
@@ -17,7 +21,14 @@ const App: React.FC = () => {
   }, [showLogin]);
 
   const handleLogin = (newUser: User) => {
-    setUser(newUser);
+    // Initialize with one default account for demo purposes if none exist
+    const userWithAccounts = {
+      ...newUser,
+      linkedAccounts: newUser.linkedAccounts || [
+        { id: '1', login: `${newUser.username.toLowerCase()}_wiked`, passwordHash: '••••••••', label: 'Konto Główne' }
+      ]
+    };
+    setUser(userWithAccounts);
     setShowLogin(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -28,13 +39,43 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const toggleLogin = () => {
-    setShowLogin(!showLogin);
+  const addIQuoteAccount = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAccLogin || !newAccPass || !user) return;
+
+    const newAccount: IQuoteAccount = {
+      id: Math.random().toString(36).substr(2, 9),
+      login: newAccLogin,
+      passwordHash: '••••••••',
+      label: `Konto ${user.linkedAccounts?.length ? user.linkedAccounts.length + 1 : 1}`
+    };
+
+    setUser({
+      ...user,
+      linkedAccounts: [...(user.linkedAccounts || []), newAccount]
+    });
+
+    setNewAccLogin('');
+    setNewAccPass('');
+    setShowAddAccount(false);
+  };
+
+  const removeAccount = (id: string) => {
+    if (!user) return;
+    setUser({
+      ...user,
+      linkedAccounts: user.linkedAccounts?.filter(acc => acc.id !== id)
+    });
   };
 
   const handleServiceClick = (serviceId: string) => {
-    if (serviceId === 'moj-wiked' && !user) {
-      setShowLogin(true);
+    if (serviceId === 'moj-wiked') {
+      if (!user) {
+        setShowLogin(true);
+      } else {
+        const section = document.getElementById('moj-wiked-section');
+        section?.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -72,7 +113,7 @@ const App: React.FC = () => {
             {user ? (
               <div className="flex items-center gap-4">
                 <div className="hidden xl:flex items-center gap-3">
-                  <a href="#moj-wiked-section" className="text-[10px] font-extrabold uppercase tracking-widest bg-slate-100 hover:bg-[#8fcc25] hover:text-white px-4 py-2 transition-all">Mój Wikęd</a>
+                  <button onClick={() => handleServiceClick('moj-wiked')} className="text-[10px] font-extrabold uppercase tracking-widest bg-slate-100 hover:bg-[#8fcc25] hover:text-white px-4 py-2 transition-all">Mój Wikęd</button>
                   <a href="https://strefa.wiked.pl/monter" target="_blank" className="text-[10px] font-extrabold uppercase tracking-widest bg-slate-100 hover:bg-black hover:text-white px-4 py-2 transition-all">Strefa Montera</a>
                 </div>
                 <div className="h-10 w-[1px] bg-black/5 hidden xl:block"></div>
@@ -86,7 +127,8 @@ const App: React.FC = () => {
               </div>
             ) : (
               <button 
-                onClick={toggleLogin}
+                // Fix: Replaced undefined toggleLogin with setShowLogin call to toggle the login view
+                onClick={() => setShowLogin(!showLogin)}
                 className="btn-black"
               >
                 {showLogin ? 'Powrót' : 'Konto / Zaloguj'}
@@ -136,6 +178,7 @@ const App: React.FC = () => {
                   const dynamicService = {...service};
                   if (service.id === 'moj-wiked' && user) {
                     dynamicService.title = 'Mój Wikęd';
+                    dynamicService.url = '#'; // Override to prevent new tab when logged in
                   }
                   return (
                     <ServiceCard 
@@ -147,32 +190,83 @@ const App: React.FC = () => {
                 })}
               </div>
 
-              {/* Logged in Area - Dynamic Tabs */}
+              {/* Logged in Area - Multiple iQuote Accounts */}
               {user && (
-                <div id="moj-wiked-section" className="mt-12 space-y-4">
-                   <div className="bg-[#8fcc25] p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8 animate-in slide-in-from-top-4 duration-500">
-                    <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 bg-white/20 flex items-center justify-center rounded-full">
-                        <Key size={32} />
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-black uppercase tracking-tighter leading-none mb-2">Twoje konto iQuote</h3>
-                        <p className="text-black/60 font-bold uppercase text-[10px] tracking-widest">Aktywna sesja: {user.username}</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-8">
-                      <div className="text-center md:text-right">
-                        <p className="text-black/40 text-[9px] font-black uppercase tracking-widest mb-1">Login iQuote</p>
-                        <p className="text-xl font-black uppercase tracking-tighter">{user.username.toLowerCase()}_wiked</p>
-                      </div>
-                      <div className="text-center md:text-right">
-                        <p className="text-black/40 text-[9px] font-black uppercase tracking-widest mb-1">Hasło</p>
-                        <p className="text-xl font-black uppercase tracking-tighter">••••••••</p>
-                      </div>
-                    </div>
-                  </div>
+                <div id="moj-wiked-section" className="mt-24 space-y-12 animate-in slide-in-from-bottom-8 duration-700">
+                   <div className="flex flex-col md:flex-row items-end justify-between gap-6 border-b border-black/5 pb-8">
+                     <div>
+                        <span className="text-[#8fcc25] text-[11px] font-extrabold uppercase tracking-[0.3em] mb-4 block">Zarządzanie kontami</span>
+                        <h2 className="text-5xl font-black uppercase tracking-tighter leading-none">Mój <span className="text-[#8fcc25]">Wikęd</span></h2>
+                        <p className="text-slate-400 font-medium mt-4">Podepnij i przełączaj się między profilami handlowymi iQuote.</p>
+                     </div>
+                     <button 
+                       onClick={() => setShowAddAccount(!showAddAccount)}
+                       className="flex items-center gap-3 bg-black text-white px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest hover:bg-[#8fcc25] transition-all"
+                     >
+                       <Plus size={18} /> {showAddAccount ? 'Anuluj' : 'Podepnij nowe konto'}
+                     </button>
+                   </div>
+
+                   {showAddAccount && (
+                     <div className="bg-slate-50 p-12 border-2 border-dashed border-slate-200 animate-in fade-in zoom-in-95 duration-300">
+                        <form onSubmit={addIQuoteAccount} className="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+                          <div className="space-y-4">
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400">Login iQuote</label>
+                            <input 
+                              type="text" 
+                              value={newAccLogin}
+                              onChange={(e) => setNewAccLogin(e.target.value)}
+                              className="w-full bg-white border border-slate-200 p-4 font-black uppercase tracking-tighter outline-none focus:border-[#8fcc25]"
+                              placeholder="ID_HANDLOWE"
+                            />
+                          </div>
+                          <div className="space-y-4">
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400">Hasło</label>
+                            <input 
+                              type="password" 
+                              value={newAccPass}
+                              onChange={(e) => setNewAccPass(e.target.value)}
+                              className="w-full bg-white border border-slate-200 p-4 font-black uppercase tracking-widest outline-none focus:border-[#8fcc25]"
+                              placeholder="••••••••"
+                            />
+                          </div>
+                          <button type="submit" className="bg-[#8fcc25] text-white p-4 font-black uppercase text-[11px] tracking-widest hover:bg-black transition-all">Autoryzuj i Dodaj</button>
+                        </form>
+                     </div>
+                   )}
+                   
+                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {user.linkedAccounts?.map((acc) => (
+                        <div key={acc.id} className="group relative bg-white border border-black/5 p-10 hover:shadow-2xl hover:border-[#8fcc25]/20 transition-all duration-500 overflow-hidden">
+                           <div className="absolute top-0 right-0 w-24 h-24 bg-[#8fcc25]/5 rounded-bl-full translate-x-8 -translate-y-8 group-hover:translate-x-4 group-hover:-translate-y-4 transition-transform duration-700"></div>
+                           <div className="flex justify-between items-start mb-10">
+                              <div className="w-12 h-12 bg-slate-100 flex items-center justify-center text-slate-400 group-hover:text-[#8fcc25] transition-colors">
+                                <Key size={20} />
+                              </div>
+                              <button 
+                                onClick={() => removeAccount(acc.id)}
+                                className="text-slate-200 hover:text-red-500 transition-colors"
+                                title="Usuń powiązanie"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                           </div>
+                           <span className="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2 block">{acc.label}</span>
+                           <h4 className="text-xl font-black uppercase tracking-tighter mb-1">{acc.login}</h4>
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                             <ShieldCheck size={12} className="text-[#8fcc25]" /> Zweryfikowano
+                           </p>
+                        </div>
+                      ))}
+
+                      {!user.linkedAccounts?.length && (
+                        <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-100 rounded-xl">
+                          <p className="text-slate-300 font-black uppercase tracking-widest text-xs">Brak podpiętych kont iQuote. Użyj przycisku powyżej aby dodać dostęp.</p>
+                        </div>
+                      )}
+                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
                     <a href="https://strefa.wiked.pl/monter" target="_blank" className="bg-black p-10 text-white flex items-center justify-between group hover:bg-[#8fcc25] transition-all">
                       <div className="flex items-center gap-6">
                         <Hammer className="text-[#8fcc25] group-hover:text-white" size={32} />
@@ -185,10 +279,10 @@ const App: React.FC = () => {
                     </a>
                     <a href="https://akademia.wiked.pl" target="_blank" className="bg-slate-100 p-10 text-black flex items-center justify-between group hover:bg-black hover:text-white transition-all">
                       <div className="flex items-center gap-6">
-                        <LayoutGrid className="text-black group-hover:text-[#8fcc25]" size={32} />
+                        <UserCircle className="text-black group-hover:text-[#8fcc25]" size={32} />
                         <div>
-                          <span className="block font-black uppercase tracking-widest text-lg">Mój Wikęd</span>
-                          <span className="text-[10px] text-black/40 group-hover:text-white/40 uppercase font-bold tracking-widest">Twoje centrum dowodzenia</span>
+                          <span className="block font-black uppercase tracking-widest text-lg">Wsparcie Techniczne</span>
+                          <span className="text-[10px] text-black/40 group-hover:text-white/40 uppercase font-bold tracking-widest">Eksperci do Twojej dyspozycji</span>
                         </div>
                       </div>
                       <ArrowRight className="group-hover:translate-x-4 transition-transform" />

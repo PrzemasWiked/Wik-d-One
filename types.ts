@@ -5,11 +5,19 @@ export enum UserRole {
   GUEST = 'GUEST'
 }
 
+export interface IQuoteAccount {
+  id: string;
+  login: string;
+  passwordHash: string;
+  label?: string;
+}
+
 export interface User {
   id: string;
   username: string;
   role: UserRole;
   email: string;
+  linkedAccounts?: IQuoteAccount[];
 }
 
 export interface ServiceLink {
