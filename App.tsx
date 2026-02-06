@@ -21,12 +21,10 @@ const App: React.FC = () => {
   }, [showLogin]);
 
   const handleLogin = (newUser: User) => {
-    // Initialize with one default account for demo purposes if none exist
+    // Initial user setup
     const userWithAccounts = {
       ...newUser,
-      linkedAccounts: newUser.linkedAccounts || [
-        { id: '1', login: `${newUser.username.toLowerCase()}_wiked`, passwordHash: '••••••••', label: 'Konto Główne' }
-      ]
+      linkedAccounts: newUser.linkedAccounts || []
     };
     setUser(userWithAccounts);
     setShowLogin(false);
@@ -47,7 +45,7 @@ const App: React.FC = () => {
       id: Math.random().toString(36).substr(2, 9),
       login: newAccLogin,
       passwordHash: '••••••••',
-      label: `Konto ${user.linkedAccounts?.length ? user.linkedAccounts.length + 1 : 1}`
+      label: `iQuote ${user.linkedAccounts?.length ? user.linkedAccounts.length + 1 : 1}`
     };
 
     setUser({
@@ -127,7 +125,6 @@ const App: React.FC = () => {
               </div>
             ) : (
               <button 
-                // Fix: Replaced undefined toggleLogin with setShowLogin call to toggle the login view
                 onClick={() => setShowLogin(!showLogin)}
                 className="btn-black"
               >
@@ -178,7 +175,7 @@ const App: React.FC = () => {
                   const dynamicService = {...service};
                   if (service.id === 'moj-wiked' && user) {
                     dynamicService.title = 'Mój Wikęd';
-                    dynamicService.url = '#'; // Override to prevent new tab when logged in
+                    dynamicService.url = '#'; 
                   }
                   return (
                     <ServiceCard 
@@ -195,15 +192,15 @@ const App: React.FC = () => {
                 <div id="moj-wiked-section" className="mt-24 space-y-12 animate-in slide-in-from-bottom-8 duration-700">
                    <div className="flex flex-col md:flex-row items-end justify-between gap-6 border-b border-black/5 pb-8">
                      <div>
-                        <span className="text-[#8fcc25] text-[11px] font-extrabold uppercase tracking-[0.3em] mb-4 block">Zarządzanie kontami</span>
+                        <span className="text-[#8fcc25] text-[11px] font-extrabold uppercase tracking-[0.3em] mb-4 block">Profil Użytkownika</span>
                         <h2 className="text-5xl font-black uppercase tracking-tighter leading-none">Mój <span className="text-[#8fcc25]">Wikęd</span></h2>
-                        <p className="text-slate-400 font-medium mt-4">Podepnij i przełączaj się między profilami handlowymi iQuote.</p>
+                        <p className="text-slate-400 font-medium mt-4">Poniżej znajdziesz swoje podpięte dostępy handlowe iQuote.</p>
                      </div>
                      <button 
                        onClick={() => setShowAddAccount(!showAddAccount)}
                        className="flex items-center gap-3 bg-black text-white px-8 py-4 text-[11px] font-extrabold uppercase tracking-widest hover:bg-[#8fcc25] transition-all"
                      >
-                       <Plus size={18} /> {showAddAccount ? 'Anuluj' : 'Podepnij nowe konto'}
+                       <Plus size={18} /> {showAddAccount ? 'Anuluj' : 'Dodaj dostęp iQuote'}
                      </button>
                    </div>
 
@@ -221,7 +218,7 @@ const App: React.FC = () => {
                             />
                           </div>
                           <div className="space-y-4">
-                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400">Hasło</label>
+                            <label className="block text-[10px] font-black uppercase tracking-widest text-slate-400">Hasło iQuote</label>
                             <input 
                               type="password" 
                               value={newAccPass}
@@ -254,14 +251,15 @@ const App: React.FC = () => {
                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2 block">{acc.label}</span>
                            <h4 className="text-xl font-black uppercase tracking-tighter mb-1">{acc.login}</h4>
                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                             <ShieldCheck size={12} className="text-[#8fcc25]" /> Zweryfikowano
+                             <ShieldCheck size={12} className="text-[#8fcc25]" /> Aktywne iQuote
                            </p>
                         </div>
                       ))}
 
-                      {!user.linkedAccounts?.length && (
-                        <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-100 rounded-xl">
-                          <p className="text-slate-300 font-black uppercase tracking-widest text-xs">Brak podpiętych kont iQuote. Użyj przycisku powyżej aby dodać dostęp.</p>
+                      {(!user.linkedAccounts || user.linkedAccounts.length === 0) && (
+                        <div className="col-span-full py-24 text-center border-2 border-dashed border-slate-100 bg-slate-50/50">
+                          <p className="text-slate-300 font-black uppercase tracking-widest text-xs mb-2">Brak podpiętych kont iQuote.</p>
+                          <p className="text-slate-400 text-[10px] font-medium">Użyj przycisku "Dodaj dostęp iQuote", aby powiązać profile handlowe ze swoim kontem Wikęd One.</p>
                         </div>
                       )}
                    </div>
@@ -281,8 +279,8 @@ const App: React.FC = () => {
                       <div className="flex items-center gap-6">
                         <UserCircle className="text-black group-hover:text-[#8fcc25]" size={32} />
                         <div>
-                          <span className="block font-black uppercase tracking-widest text-lg">Wsparcie Techniczne</span>
-                          <span className="text-[10px] text-black/40 group-hover:text-white/40 uppercase font-bold tracking-widest">Eksperci do Twojej dyspozycji</span>
+                          <span className="block font-black uppercase tracking-widest text-lg">Akademia Wikęd</span>
+                          <span className="text-[10px] text-black/40 group-hover:text-white/40 uppercase font-bold tracking-widest">Twoja ścieżka rozwoju</span>
                         </div>
                       </div>
                       <ArrowRight className="group-hover:translate-x-4 transition-transform" />
@@ -342,13 +340,13 @@ const App: React.FC = () => {
                       Wzmocnij swój <br /> <span className="text-[#8fcc25]">biznes.</span>
                     </h2>
                     <p className="text-slate-400 text-lg mb-12 font-medium">
-                      Zarejestruj profil iQuote i uzyskaj dostęp do zaawansowanych systemów zamówień Wikęd.
+                      Zarejestruj się w Wikęd One i zyskaj centralny dostęp do wszystkich narzędzi handlowych.
                     </p>
                     <button 
                       onClick={() => setShowLogin(true)}
                       className="bg-white text-black px-12 py-5 text-[11px] font-extrabold uppercase tracking-[0.3em] hover:bg-[#8fcc25] hover:text-white transition-all flex items-center gap-4 group"
                     >
-                      Zarejestruj profil <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-500" />
+                      Utwórz konto <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform duration-500" />
                     </button>
                   </div>
                 </div>
